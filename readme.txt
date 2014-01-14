@@ -16,7 +16,7 @@ The xPinner Lite WordPress plugin is intended to automatically pin images to Pin
 
 Key features
 
-* The xPinner Lite plugin works absolutely automatically and does not require any manual input. It does not matter how exactly your post was added – manually or it was created by a content automation script like [CyberSyn](http://wordpress.org/plugins/cybersyn/ "CyberSyn")
+* The xPinner Lite plugin works absolutely automatically and does not require any manual input. It does not matter how exactly your post was added - manually or it was created by a content automation script like [CyberSyn](http://wordpress.org/plugins/cybersyn/ "CyberSyn")
 * The plugin is able to automatically extract a first, last or a random image from a regular post/page body, WordPress galleries, NextGEN galleries, post thumbnail or a custom field with a given name and automatically pin it!
 * The xPinner Lite plugin will pin images not only the new posts, but from old ones too!
 * You can limit the oldness of posts that can be processed by xPinner Lite.
