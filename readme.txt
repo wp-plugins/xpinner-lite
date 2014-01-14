@@ -28,7 +28,6 @@ System requirements
 * PHP 5.2.4 or greater
 * MySQL 5.0 or greater
 * PHP cURL extension
-* PHP Zlib extension
 
 == Installation ==
 
