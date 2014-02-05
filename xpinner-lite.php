@@ -27,7 +27,7 @@ $xpinner_default_options = array(
     'custom_filed_name' => '',
     'pin_limit' => 3600,
     'limit_older_posts' => 1440,
-    'image_min' => 0.3,
+    'image_min' => 0.1,
     'image_max' => 6,
     'magic' => md5(get_option('site_name'))
 );
