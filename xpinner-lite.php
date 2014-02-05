@@ -4,7 +4,7 @@
   Author: CyberSEO.NET
   Author URI: http://www.cyberseo.net/
   Plugin URI: http://www.cyberseo.net/xpinner-lite/
-  Version: 1.0
+  Version: 1.1
   Description: Automatically pins images to Pinterest.com
  */
 
@@ -28,7 +28,7 @@ $xpinner_default_options = array(
     'pin_limit' => 3600,
     'limit_older_posts' => 1440,
     'image_min' => 0.3,
-    'image_max' => 6,    
+    'image_max' => 6,
     'magic' => md5(get_option('site_name'))
 );
 
@@ -81,7 +81,7 @@ function xpinner_settings() {
                 document.getElementById("custom_filed_name").style.display = 'none'; 
             }
         }        
-                                                                                                                                                                                                                    
+                                                                                                                                                                                                                        
         function toggleCron() {
             if (document.getElementById('use_cron').checked) {
                 document.getElementById("cron_note").style.display = 'inline';
@@ -275,8 +275,8 @@ function xpinner_pin_pinterest($xpinner_options, $post, $image_url) {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_USERAGENT, XPINNER_USER_AGENT);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
-    curl_setopt($ch, CURLOPT_COOKIEJAR, "cookie.txt");
-    curl_setopt($ch, CURLOPT_COOKIEFILE, 'cookie.txt');
+    curl_setopt($ch, CURLOPT_COOKIEJAR, plugin_dir_path(__FILE__) . 'cookie.txt');
+    curl_setopt($ch, CURLOPT_COOKIEFILE, plugin_dir_path(__FILE__) . 'cookie.txt');
     curl_setopt($ch, CURLOPT_HTTPGET, true);
 
     $url = 'https://www.pinterest.com/login/?next=%2Flogin%2F';
@@ -296,6 +296,7 @@ function xpinner_pin_pinterest($xpinner_options, $post, $image_url) {
     $_pinterest_sess = $matches[1];
 
     if (!strlen(trim($_pinterest_sess))) {
+        curl_close($ch);
         return false;
     }
 
