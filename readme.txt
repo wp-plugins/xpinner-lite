@@ -5,7 +5,7 @@ Author: CyberSEO
 Author URI: http://www.cyberseo.net/
 Tags: pinterest, pinterest.com, social, pinboard, pin, pinner
 Requires at least: 3.6.0
-Tested up to: 3.8.1
+Tested up to: 3.9.1
 Stable tag: 4.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -18,9 +18,9 @@ Key features
 
 * The xPinner Lite plugin works absolutely automatically and does not require any manual input. It does not matter how exactly your post was added - manually or it was created by a content automation script like [CyberSyn](http://wordpress.org/plugins/cybersyn/ "CyberSyn").
 * The plugin is able to automatically extract a first, last or a random image from a regular post/page body, WordPress galleries, NextGEN galleries, post thumbnail or a custom field with a given name and automatically pin it!
-* The xPinner Lite plugin will pin images not only the new posts, but from old ones too!
+* The xPinner Lite plugin will pin images not only from the new posts, but from old ones too!
 * You can limit the oldness of posts that can be processed by xPinner Lite.
-* You can set the frequencies of pins to avoid your account suspension for a free frequent pinning.
+* You can set the frequencies of pins to avoid your account suspension for a too frequent pinning.
 
 System requirements
 
