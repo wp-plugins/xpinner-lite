@@ -4,7 +4,7 @@
   Author: CyberSEO.NET
   Author URI: http://www.cyberseo.net/
   Plugin URI: http://www.cyberseo.net/xpinner-lite/
-  Version: 1.2
+  Version: 1.3
   Description: Automatically pins images to Pinterest.com
  */
 
@@ -301,13 +301,18 @@ function xpinner_pin_pinterest($xpinner_options, $post, $image_url) {
     }
 
     $url = 'https://www.pinterest.com/resource/UserSessionResource/create/';
-    $data = 'source_url=%2Flogin%2F&data=%7B%22options%22%3A%7B%22username_or_email%22%3A%22' . urlencode($xpinner_options['pinterest_email']) . '%22%2C%22password%22%3A%22' . urlencode($xpinner_options['pinterest_password']) . '%22%7D%2C%22context%22%3A%7B%22app_version%22%3A%22f94de18%22%7D%7D&module_path=App()%3ELoginPage()%3ELogin()%3EButton(class_name%3Dprimary%2C+text%3DLog+in%2C+type%3Dsubmit%2C+tagName%3Dbutton%2C+size%3Dlarge)';
+   
+    $data = 'source_url=%2Flogin%2F&data=%7B%22options%22%3A%7B%22username_or_email%22%3A%22' . urlencode($xpinner_options['pinterest_email']) . '%22%2C%22password%22%3A%22' . urlencode($xpinner_options['pinterest_password']) . '%22%7D%2C%22context%22%3A%7B%7D%7D&module_path=App()%3ELoginPage()%3ELogin()%3EButton(class_name%3Dprimary%2C%2Btext%3DLog%2BIn%2C%2Btype%3Dsubmit%2C%2Bsize%3Dlarge)';
 
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-CSRFToken:' . $csrftoken, 'HOST:www.pinterest.com', 'X-NEW-APP:1', 'Referer:https://www.pinterest.com/login/', 'X-Requested-With:XMLHttpRequest'));
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
+    curl_exec($ch);
+    
+    $url = 'https://www.pinterest.com/';
+    curl_setopt($ch, CURLOPT_URL, $url);
     $res = curl_exec($ch);
 
     preg_match('/"username": "(.*?)"/', $res, $matches);

@@ -47,6 +47,9 @@ The support forums can be found at http://www.cyberseo.net/forum/.
 
 == Changelog ==
 
+= 1.3 =
+* Urgent fix: The Pinterest script has been changed, so the old versions of this plugin won't work anymore. Make sure to install this update.
+
 = 1.1 =
 * Critical bug fix.
 
