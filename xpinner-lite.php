@@ -328,12 +328,6 @@ function xpinner_pin_pinterest($xpinner_options, $post, $image_url) {
     curl_setopt($ch, CURLOPT_POST, false);
     $res = curl_exec($ch);
 
-    preg_match('/"username": "(.*?)"/', $res, $matches);
-    $user = $matches[1];
-    if (!strlen($user)) {
-        return false;
-    }
-
     $url = 'http://www.pinterest.com/resource/NoopResource/get/?source_url=%2Fpin%2Ffind%2F%3Furl%3D' . urlencode(get_permalink($post->ID)) . '&data=%7B%22options%22%3A%7B%7D%2C%22context%22%3A%7B%7D%2C%22module%22%3A%7B%22name%22%3A%22PinCreate%22%2C%22options%22%3A%7B%22image_url%22%3A%22' . urlencode($image_url) . '%22%2C%22action%22%3A%22create%22%2C%22method%22%3A%22scraped%22%2C%22link%22%3A%22' . urlencode(get_permalink($post->ID)) . '%22%2C%22transparent_modal%22%3Afalse%7D%7D%2C%22render_type%22%3A1%2C%22error_strategy%22%3A0%7D&module_path=App()%3EImagesFeedPage(resource%3DFindPinImagesResource(url%3D' . urlencode(get_permalink($post->ID)) . '))%3EGrid()%3EGridItems()%3EPinnable(url%3D' . urlencode($image_url) . '%2C+type%3Dpinnable%2C+link%3D' . urlencode(get_permalink($post->ID)) . ')&_=1404210299131';
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Requested-With:XMLHttpRequest'));
     curl_setopt($ch, CURLOPT_COOKIE, '_pinterest_sess="' . $_pinterest_sess . '"');
