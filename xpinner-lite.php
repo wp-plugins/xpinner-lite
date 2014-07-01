@@ -4,7 +4,7 @@
   Author: CyberSEO.NET
   Author URI: http://www.cyberseo.net/
   Plugin URI: http://www.cyberseo.net/xpinner-lite/
-  Version: 1.3
+  Version: 1.4
   Description: Automatically pins images to Pinterest.com
  */
 
@@ -275,12 +275,9 @@ function xpinner_pin_pinterest($xpinner_options, $post, $image_url) {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_USERAGENT, XPINNER_USER_AGENT);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
-    curl_setopt($ch, CURLOPT_COOKIEJAR, plugin_dir_path(__FILE__) . 'cookie.txt');
-    curl_setopt($ch, CURLOPT_COOKIEFILE, plugin_dir_path(__FILE__) . 'cookie.txt');
     curl_setopt($ch, CURLOPT_HTTPGET, true);
 
     $url = 'https://www.pinterest.com/login/?next=%2Flogin%2F';
-
     curl_setopt($ch, CURLOPT_REFERER, 'https://pinterest.com/login/');
     curl_setopt($ch, CURLOPT_URL, $url);
     $res = curl_exec($ch);
@@ -292,7 +289,31 @@ function xpinner_pin_pinterest($xpinner_options, $post, $image_url) {
 
     preg_match('/csrftoken=(.*?);/', $res, $matches);
     $csrftoken = $matches[1];
-    preg_match('/_pinterest_sess="(.*?)"/', $res, $matches);
+
+    preg_match('/_pinterest_sess=\"(.*?)\"/', $res, $matches);
+    if (count($matches) == 0) {
+        preg_match('/_pinterest_sess=(.*?);/', $res, $matches);
+    }
+    $_pinterest_sess = $matches[1];
+
+    if (!strlen(trim($csrftoken)) || !strlen(trim($_pinterest_sess))) {
+        curl_close($ch);
+        return false;
+    }
+
+    $url = 'https://www.pinterest.com/resource/UserSessionResource/create/';
+    $data = 'source_url=%2Flogin%2F&data=%7B%22options%22%3A%7B%22username_or_email%22%3A%22' . urlencode($xpinner_options['pinterest_email']) . '%22%2C%22password%22%3A%22' . urlencode($xpinner_options['pinterest_password']) . '%22%7D%2C%22context%22%3A%7B%7D%7D&module_path=App()%3ELoginPage()%3ELogin()%3EButton(class_name%3Dprimary%2C%2Btext%3DLog%2BIn%2C%2Btype%3Dsubmit%2C%2Bsize%3Dlarge)';
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-CSRFToken:' . $csrftoken, 'HOST:www.pinterest.com', 'X-NEW-APP:1', 'Referer:https://www.pinterest.com/login/', 'X-Requested-With:XMLHttpRequest'));
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_COOKIE, '_pinterest_sess="' . $_pinterest_sess . '";csrftoken=' . $csrftoken);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    $res = curl_exec($ch);
+
+    preg_match('/_pinterest_sess=\"(.*?)\"/', $res, $matches);
+    if (count($matches) == 0) {
+        preg_match('/_pinterest_sess=(.*?);/', $res, $matches);
+    }
     $_pinterest_sess = $matches[1];
 
     if (!strlen(trim($_pinterest_sess))) {
@@ -300,48 +321,37 @@ function xpinner_pin_pinterest($xpinner_options, $post, $image_url) {
         return false;
     }
 
-    $url = 'https://www.pinterest.com/resource/UserSessionResource/create/';
-   
-    $data = 'source_url=%2Flogin%2F&data=%7B%22options%22%3A%7B%22username_or_email%22%3A%22' . urlencode($xpinner_options['pinterest_email']) . '%22%2C%22password%22%3A%22' . urlencode($xpinner_options['pinterest_password']) . '%22%7D%2C%22context%22%3A%7B%7D%7D&module_path=App()%3ELoginPage()%3ELogin()%3EButton(class_name%3Dprimary%2C%2Btext%3DLog%2BIn%2C%2Btype%3Dsubmit%2C%2Bsize%3Dlarge)';
-
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-CSRFToken:' . $csrftoken, 'HOST:www.pinterest.com', 'X-NEW-APP:1', 'Referer:https://www.pinterest.com/login/', 'X-Requested-With:XMLHttpRequest'));
+    $url = 'http://www.pinterest.com/';
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Requested-With:XMLHttpRequest'));
+    curl_setopt($ch, CURLOPT_COOKIE, '_pinterest_sess="' . $_pinterest_sess . '"');
     curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-
-    curl_exec($ch);
-    
-    $url = 'https://www.pinterest.com/';
-    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_POST, false);
     $res = curl_exec($ch);
 
     preg_match('/"username": "(.*?)"/', $res, $matches);
     $user = $matches[1];
-
     if (!strlen($user)) {
-        curl_close($ch);
         return false;
     }
 
-    $board_url = urlencode(mb_strtolower(preg_replace('/\s+/', '-', preg_replace('/[\'&-]/', ' ', stripslashes($xpinner_options['pinterest_board_id'])))));
-
-    $url = 'http://www.pinterest.com/' . $user . '/' . $board_url;
-    curl_setopt($ch, CURLOPT_HTTPGET, 1);
+    $url = 'http://www.pinterest.com/resource/NoopResource/get/?source_url=%2Fpin%2Ffind%2F%3Furl%3D' . urlencode(get_permalink($post->ID)) . '&data=%7B%22options%22%3A%7B%7D%2C%22context%22%3A%7B%7D%2C%22module%22%3A%7B%22name%22%3A%22PinCreate%22%2C%22options%22%3A%7B%22image_url%22%3A%22' . urlencode($image_url) . '%22%2C%22action%22%3A%22create%22%2C%22method%22%3A%22scraped%22%2C%22link%22%3A%22' . urlencode(get_permalink($post->ID)) . '%22%2C%22transparent_modal%22%3Afalse%7D%7D%2C%22render_type%22%3A1%2C%22error_strategy%22%3A0%7D&module_path=App()%3EImagesFeedPage(resource%3DFindPinImagesResource(url%3D' . urlencode(get_permalink($post->ID)) . '))%3EGrid()%3EGridItems()%3EPinnable(url%3D' . urlencode($image_url) . '%2C+type%3Dpinnable%2C+link%3D' . urlencode(get_permalink($post->ID)) . ')&_=1404210299131';
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Requested-With:XMLHttpRequest'));
+    curl_setopt($ch, CURLOPT_COOKIE, '_pinterest_sess="' . $_pinterest_sess . '"');
     curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml'));
-
     $res = curl_exec($ch);
 
-    preg_match('/"board_id": "(\d+)"/', $res, $matches);
+    preg_match('/"name": "' . preg_quote($xpinner_options['pinterest_board_id']) . '", "privacy": ".+", "type": "board", "id": "(.*?)"/s', $res, $matches);
     $board_id = $matches[1];
 
     $url = 'http://www.pinterest.com/resource/PinResource/create/';
-    $data = 'data=%7B%22options%22%3A%7B%22board_id%22%3A%22' . $board_id . '%22%2C%22description%22%3A%22' . urlencode($post->post_title) . '%22%2C%22link%22%3A%22' . urlencode(get_permalink($post->ID)) . '%22%2C%22image_url%22%3A%22' . urlencode($image_url) . '%22%2C%22method%22%3A%22scraped%22%7D%2C%22context%22%3A%7B%22app_version%22%3A%2291bf%22%7D%7D&source_url=%2Fpin%2Ffind%2F%3Furl%3D' . urlencode($image_url) . '&module_path=App()%3EImagesFeedPage(resource%3DFindPinImagesResource(url%3D' . urlencode($image_url) . '))%3EGrid()%3EPinnable(url%3D' . urlencode($image_url) . '%2C+link%3D' . urlencode(get_permalink($post->ID)) . '%2C+type%3Dpinnable)%23Modal(module%3DPinCreate())';
+    $data = 'data=%7B%22options%22%3A%7B%22board_id%22%3A%22' . $board_id . '%22%2C%22description%22%3A%22' . $post->post_title . '%22%2C%22link%22%3A%22' . urlencode(get_permalink($post->ID)) . '%22%2C%22image_url%22%3A%22' . urlencode($image_url) . '%22%2C%22method%22%3A%22scraped%22%7D%2C%22context%22%3A%7B%22app_version%22%3A%2291bf%22%7D%7D&source_url=%2Fpin%2Ffind%2F%3Furl%3D' . urlencode($image_url) . '&module_path=App()%3EImagesFeedPage(resource%3DFindPinImagesResource(url%3D' . urlencode($image_url) . '))%3EGrid()%3EPinnable(url%3D' . urlencode($image_url) . '%2C+link%3D' . urlencode(get_permalink($post->ID)) . '%2C+type%3Dpinnable)%23Modal(module%3DPinCreate())';
+    $ch = curl_init();
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-CSRFToken:' . $csrftoken, 'X-Requested-With:XMLHttpRequest'));
     curl_setopt($ch, CURLOPT_REFERER, 'http://pinterest.com/');
-    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_COOKIE, '_pinterest_sess="' . $_pinterest_sess . '";csrftoken=' . $csrftoken);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($ch, CURLOPT_URL, $url);
     $res = curl_exec($ch);
     curl_close($ch);
 

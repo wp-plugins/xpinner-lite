@@ -32,8 +32,7 @@ System requirements
 == Installation ==
 
 1. Upload 'xpinner-lite' to the '/wp-content/plugins/' directory
-2. Make cookie.txt writable to the plugin (chmod 666)
-3. Activate the plugin through the 'Plugins' menu in WordPress
+2. Activate the plugin through the 'Plugins' menu in WordPress
 
 == Frequently Asked Questions ==
 
@@ -46,6 +45,9 @@ The support forums can be found at http://www.cyberseo.net/forum/.
 1. The interface options panel.
 
 == Changelog ==
+
+= 1.4 =
+* Urgent fix: The Pinterest script has been changed, so the old versions of this plugin won't work anymore. Make sure to install this update.
 
 = 1.3 =
 * Urgent fix: The Pinterest script has been changed, so the old versions of this plugin won't work anymore. Make sure to install this update.
