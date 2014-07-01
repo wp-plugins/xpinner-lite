@@ -55,10 +55,6 @@ function xpinner_settings() {
             $xpinner_message = '<div id="message" class="updated fade"><h3>Warning!</h3>
 	      <p>Your WordPress engine is outdated. Please update it at least to version 3.6.0. Otherwise the plugin will may not work correctly.</p></div>';
         }
-        if (!is_writable(plugin_dir_path(__FILE__) . 'cookie.txt')) {
-            $xpinner_message = '<div id="message" class="updated fade"><h3>Warning!</h3>
-	      <p>File <strong>' . plugin_dir_path(__FILE__) . 'cookie.txt' . '</strong> is not writable. You must chmod it to 666. Otherwise the plugin will not work.</p></div>';
-        }
     }
     ?>
 
