@@ -4,7 +4,7 @@
   Author: CyberSEO.NET
   Author URI: http://www.cyberseo.net/
   Plugin URI: http://www.cyberseo.net/xpinner-lite/
-  Version: 1.6
+  Version: 1.7
   Description: Automatically pins images to Pinterest.com
  */
 
@@ -28,8 +28,7 @@ $xpinner_default_options = array(
     'pin_limit' => 3600,
     'limit_older_posts' => 1440,
     'image_min' => 0.1,
-    'image_max' => 6,
-    'magic' => md5(get_option('site_name'))
+    'image_max' => 6
 );
 
 $xpinner_options = get_option(XPINNER_OPTIONS, array());
@@ -103,7 +102,7 @@ function xpinner_settings() {
                         <td>
                             <input type="checkbox" name="use_cron" id="use_cron" <?php if (isset($xpinner_options['use_cron'])) echo "checked "; ?>>
                             <div id="cron_note" style="display:none;">- In this mode, you need to manually configure cron at your host. For example, if you want run a cron job once a hour, just add the following line into your crontab:<br />
-                                <strong>0 * * * * /usr/bin/curl --silent <?php echo get_option('siteurl') . '/?xpinner=' . $xpinner_options['magic']; ?></strong></div>
+                                <strong>0 * * * * /usr/bin/curl --silent <?php echo get_option('siteurl') . '/?xpinner=' . md5(get_option('site_name')); ?></strong></div>
                         </td>
                     </tr>                     
 
@@ -354,7 +353,7 @@ function xpinner_pin_pinterest($xpinner_options, $post, $image_url) {
 
 function xpinner_is_cron() {
     global $xpinner_options;
-    return (!is_admin() && isset($_GET['xpinner']) && $_GET['xpinner'] == $xpinner_options['magic'] && isset($xpinner_options['use_cron']));
+    return (!is_admin() && isset($_GET['xpinner']) && $_GET['xpinner'] == md5(get_option('site_name')) && isset($xpinner_options['use_cron']));
 }
 
 function xpinner_do_pin() {

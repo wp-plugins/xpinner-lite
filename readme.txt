@@ -46,7 +46,7 @@ The support forums can be found at http://www.cyberseo.net/forum/.
 
 == Changelog ==
 
-= 1.6 =
+= 1.7 =
 * Work in cron mode has been improved.
 * The code has been optimized.
 
