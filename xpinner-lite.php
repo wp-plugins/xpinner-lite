@@ -4,7 +4,7 @@
   Author: CyberSEO.NET
   Author URI: http://www.cyberseo.net/
   Plugin URI: http://www.cyberseo.net/xpinner-lite/
-  Version: 1.5
+  Version: 1.6
   Description: Automatically pins images to Pinterest.com
  */
 
@@ -77,7 +77,7 @@ function xpinner_settings() {
                 document.getElementById("custom_filed_name").style.display = 'none'; 
             }
         }        
-                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                        
         function toggleCron() {
             if (document.getElementById('use_cron').checked) {
                 document.getElementById("cron_note").style.display = 'inline';
@@ -345,7 +345,7 @@ function xpinner_pin_pinterest($xpinner_options, $post, $image_url) {
     $res = curl_exec($ch);
     curl_close($ch);
 
-    if (strpos($res, '"error": null') === false) {
+    if (strpos($res, '"error": null') !== false) {
         return false;
     }
 
@@ -360,87 +360,77 @@ function xpinner_is_cron() {
 function xpinner_do_pin() {
     global $xpinner_options, $post;
 
-    if (xpinner_is_cron() || !isset($xpinner_options['use_cron'])) {
-
-        if (xpinner_is_cron()) {
-            $last_open_post = get_option(XPINNER_LAST_OPEN_POST);
-            if ($last_open_post) {
-                $post = get_post($last_open_post);
-            } else {
-                $args = array('numberposts' => 1, 'offset' => 0, 'orderby' => 'post_date', 'order' => 'DESC', 'post_status' => 'publish');
-                $posts = get_posts($args);
-                $post = get_post($posts[0]->ID);
-            }
-            unset($_GET['xpinner']);
-        }
-
-        $gmt_offset = 3600 * intval(get_option('gmt_offset'));
-
-        if (!isset($xpinner_options['use_cron'])) {
-            $last_pin_time = intval(get_option(XPINNER_LAST_PIN_TIME, 0));
+    if (xpinner_is_cron()) {
+        $last_open_post = get_option(XPINNER_LAST_OPEN_POST);
+        if ($last_open_post) {
+            $post = get_post($last_open_post);
         } else {
-            $last_pin_time = 0;
+            $args = array('numberposts' => 1, 'offset' => 0, 'orderby' => 'post_date', 'order' => 'DESC', 'post_status' => 'publish');
+            $posts = get_posts($args);
+            $post = get_post($posts[0]->ID);
         }
-
-        if ($post->post_status == 'publish' && strtotime($post->post_date) >= (time() + $gmt_offset - 60 * intval($xpinner_options['limit_older_posts'])) && time() >= $last_pin_time + intval($xpinner_options['pin_limit'])) {
-
-            update_option(XPINNER_LAST_PIN_TIME, time());
-
-            $images = xpinner_get_images($xpinner_options, $post);
-
-            if (count($images)) {
-
-                $image_url = xpinner_get_image_url($xpinner_options, $images);
-                $img_info = getimagesize($image_url);
-                $size = floatval($img_info[0]) * floatval($img_info[1]) / 1000000;
-
-                if ($size >= floatval($xpinner_options['image_min']) && $size <= floatval($xpinner_options['image_max'])) {
-
-                    if (get_post_meta($post->ID, 'xPinner', true) != 'pinterest.com' &&
-                            strlen($xpinner_options['pinterest_email']) &&
-                            strlen($xpinner_options['pinterest_password']) &&
-                            strlen($xpinner_options['pinterest_board_id'])) {
-
-                        if (xpinner_pin_pinterest($xpinner_options, $post, $image_url)) {
-                            update_post_meta($post->ID, 'xPinner', 'pinterest.com');
-                        }
-
-                        file_put_contents(plugin_dir_path(__FILE__) . 'cookie.txt', '', LOCK_EX);
-                    }
-                }
-            }
-        }
+        unset($_GET['xpinner']);
+        $last_pin_time = 0;
     } else {
-        if (isset($post)) {
+        $last_pin_time = intval(get_option(XPINNER_LAST_PIN_TIME, 0));
+    }
 
-            if ($post->post_status == 'publish' &&
-                    strtotime($post->post_date) >= (time() + $gmt_offset - 60 * intval($xpinner_options['limit_older_posts']))) {
+    $gmt_offset = 3600 * intval(get_option('gmt_offset'));
+
+    if (!isset($xpinner_options['use_cron'])) {
+        $last_pin_time = intval(get_option(XPINNER_LAST_PIN_TIME, 0));
+    } else {
+        $last_pin_time = 0;
+    }
+
+    if ($post->post_status == 'publish' && strtotime($post->post_date) >= (time() + $gmt_offset - 60 * intval($xpinner_options['limit_older_posts'])) && time() >= $last_pin_time + intval($xpinner_options['pin_limit'])) {
+
+        update_option(XPINNER_LAST_PIN_TIME, time());
+
+        $images = xpinner_get_images($xpinner_options, $post);
+
+        if (count($images)) {
+
+            $image_url = xpinner_get_image_url($xpinner_options, $images);
+            $img_info = getimagesize($image_url);
+            $size = floatval($img_info[0]) * floatval($img_info[1]) / 1000000;
+
+            if ($size >= floatval($xpinner_options['image_min']) && $size <= floatval($xpinner_options['image_max'])) {
 
                 if (get_post_meta($post->ID, 'xPinner', true) != 'pinterest.com' &&
                         strlen($xpinner_options['pinterest_email']) &&
                         strlen($xpinner_options['pinterest_password']) &&
                         strlen($xpinner_options['pinterest_board_id'])) {
 
-                    update_option(XPINNER_LAST_OPEN_POST, $post->ID);
+                    if (xpinner_pin_pinterest($xpinner_options, $post, $image_url)) {
+                        update_post_meta($post->ID, 'xPinner', 'pinterest.com');
+                    }
+                    update_option(XPINNER_LAST_OPEN_POST, false);
 
-                    return;
+                    file_put_contents(plugin_dir_path(__FILE__) . 'cookie.txt', '', LOCK_EX);
                 }
             }
         }
-
-        update_option(XPINNER_LAST_OPEN_POST, false);
     }
-}
-
-if (xpinner_is_cron()) {
-    add_action('shutdown', 'xpinner_do_pin');
 }
 
 function xpinner_content($content) {
-    if ((is_single() || is_page()) && function_exists('xpinner_do_pin')) {
+    global $post, $xpinner_options;
+    $gmt_offset = 3600 * intval(get_option('gmt_offset'));
+    if ($post->post_status == 'publish' && strtotime($post->post_date) >= (time() + $gmt_offset - 60 * intval($xpinner_options['limit_older_posts']))) {
         add_action('shutdown', 'xpinner_do_pin');
     }
     return $content;
+}
+
+function xpinner_set_last_post() {
+    global $post, $xpinner_options;
+    if (get_post_meta($post->ID, 'xPinner', true) != 'pinterest.com' &&
+            strlen($xpinner_options['pinterest_email']) &&
+            strlen($xpinner_options['pinterest_password']) &&
+            strlen($xpinner_options['pinterest_board_id'])) {
+        update_option(XPINNER_LAST_OPEN_POST, $post->ID);
+    }
 }
 
 function xpinner_main_menu() {
@@ -450,6 +440,12 @@ function xpinner_main_menu() {
 if (is_admin()) {
     add_action('admin_menu', 'xpinner_main_menu');
 } else {
-    add_filter('the_content', 'xpinner_content');
+    if (xpinner_is_cron()) {
+        add_action('shutdown', 'xpinner_do_pin');
+    } elseif (!isset($xpinner_options['use_cron'])) {
+        add_filter('the_content', 'xpinner_content');
+    } else {
+        add_action('shutdown', 'xpinner_set_last_post');
+    }
 }
 ?>
