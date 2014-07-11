@@ -377,12 +377,6 @@ function xpinner_do_pin() {
 
     $gmt_offset = 3600 * intval(get_option('gmt_offset'));
 
-    if (!isset($xpinner_options['use_cron'])) {
-        $last_pin_time = intval(get_option(XPINNER_LAST_PIN_TIME, 0));
-    } else {
-        $last_pin_time = 0;
-    }
-
     if ($post->post_status == 'publish' && strtotime($post->post_date) >= (time() + $gmt_offset - 60 * intval($xpinner_options['limit_older_posts'])) && time() >= $last_pin_time + intval($xpinner_options['pin_limit'])) {
 
         update_option(XPINNER_LAST_PIN_TIME, time());
