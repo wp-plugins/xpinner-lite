@@ -4,7 +4,7 @@
   Author: CyberSEO.NET
   Author URI: http://www.cyberseo.net/
   Plugin URI: http://www.cyberseo.net/xpinner-lite/
-  Version: 1.7
+  Version: 1.8
   Description: Automatically pins images to Pinterest.com
  */
 
