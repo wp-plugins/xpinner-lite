@@ -5,7 +5,7 @@ Author: CyberSEO
 Author URI: http://www.cyberseo.net/
 Tags: pinterest, pinterest.com, social, pinboard, pin, pinner
 Requires at least: 3.6
-Tested up to: 4.0.1
+Tested up to: 4.1
 Stable tag: 4.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -45,6 +45,9 @@ The support forums can be found at http://www.cyberseo.net/forum/.
 1. The interface options panel.
 
 == Changelog ==
+
+= 2.0 =
+* Urgent fix: The Pinterest script has been changed, so the old versions of this plugin won't work anymore. Make sure to install this update.
 
 = 1.9 =
 * Fully compatible with WordPress 4.0.1

@@ -4,7 +4,7 @@
   Author: CyberSEO.NET
   Author URI: http://www.cyberseo.net/
   Plugin URI: http://www.cyberseo.net/xpinner-lite/
-  Version: 1.9
+  Version: 2.0
   Description: Automatically pins images to Pinterest.com
  */
 
@@ -329,7 +329,7 @@ function xpinner_pin_pinterest($xpinner_options, $post, $image_url) {
     curl_setopt($ch, CURLOPT_URL, $url);
     $res = curl_exec($ch);
 
-    preg_match('/"name": "' . preg_quote($xpinner_options['pinterest_board_id']) . '", "privacy": "\w+", "type": "board", "id": "(\d+)"/s', $res, $matches);
+    preg_match('/"name": "' . preg_quote($xpinner_options['pinterest_board_id']) . '".*?"id": "(\d+)"/s', $res, $matches);
     $board_id = $matches[1];
 
     $url = 'http://www.pinterest.com/resource/PinResource/create/';
