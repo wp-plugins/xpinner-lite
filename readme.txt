@@ -48,6 +48,7 @@ The support forums can be found at http://www.cyberseo.net/forum/.
 
 = 2.0 =
 * Urgent fix: The Pinterest script has been changed, so the old versions of this plugin won't work anymore. Make sure to install this update.
+* Fully compatible with WordPress 4.1
 
 = 1.9 =
 * Fully compatible with WordPress 4.0.1
