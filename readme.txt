@@ -3,7 +3,7 @@ Contributors: CyberSEO
 Plugin URI: http://www.cyberseo.net/xpinner-lite/
 Author: CyberSEO
 Author URI: http://www.cyberseo.net/
-Tags: pinterest, pinterest.com, social, pinboard, pin, pinner
+Tags: pinterest, social, pinboard, pin, pinner
 Requires at least: 3.6
 Tested up to: 4.1
 Stable tag: 4.3
